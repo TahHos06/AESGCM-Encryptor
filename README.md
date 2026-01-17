@@ -1,2 +1,14 @@
 # AESGCM-Encryptor
-This is an encryptor app that encrypts files using Advanced Encryption Standard: Gallois Counter Mode (or AESGCM).
+This is an encryptor app that encrypts files using Advanced Encryption Standard: Galois Counter Mode (or AESGCM). AES GCM is a mode of encryption that is used industry-wide due to its ability to not only encrypt data but also authenticate data using an authentication tag. Therefore, this not only checks off Confidentiality but also Integrity as well within the CIA triad. For this code, we first need to install and import the cryptography module as well as the os module.
+
+# load_or_createkey()
+This first function is critical to both encrypting and decrypting our data since AESGCM relies on the same symmetric key to both encrypt and decrypt the data. So this function first checks if we already have a key stored within a keys file. If we do, then we read the file and store the key in the keys variable. However, if we don't have a key stored in the keys file, then we generate a 256-bit key and store it in the keys file. NOTE: As mentioned before, this key is the backbone of AESGCM, so it is important that we keep the keys file somewhere safe.
+
+# encrypt_data(file_path,key)
+The second function is where the fun begins. The parameters here are the file we want to encrypt and the key we generated from the first function. So here, the first step is to create a nonce. A nonce (or a number used once) is a unique number that is used during encryption to ensure that our ciphertext is different every time we encrypt our data (even if it is the same plaintext). This means that every time we call this function, we generate a new nonce. After this, we read the contents of the file and store it in a variable. Then we create a cipher object using our key and encrypt the data using the .encrypt method. This method has three parameters: 1) the nonce, 2) the data we want to encrypt, and 3) the Associated Authenticated Data (AAD), which helps authenticate our data (we can leave this parameter as None). We store the encrypted data in the ciphertext variable, combine it with the nonce in another variable, and store it in an .enc file for later use. 
+
+# decrypt_data(enc_file,key)
+The third function is where we decrypt our encrypted file. The parameters here are an encrypted file (from previous function) and the key. So first, we read and extract the nonce and ciphertext, then store them in their own variables. Then, similar to the second function, we create a cipher object, but instead of using the encrypt method, we use the decrypt method. This method has the same parameters as the encrypt method. But here we implement try & except, so we first try the decrypt method and see if it passes the integrity check; if it doesn't, then it throws the invalidtag exception and ends the function, preventing our program from writing the corrupted data. But if it passes the integrity check, then we write our encrypted data into a new file.
+
+# main
+The main function is where we put everything together and ask the user what they want to do. e- calls encrypt function, d- calls decrypt function, x-exit
